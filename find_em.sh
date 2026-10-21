@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exec > image_list.txt 2> image_err.txt
+
 # Windows laptop git bash usb drive: cd /d
 # chris@2022-inspiron MINGW64 /d
 # $ time ./find_em.sh ~
@@ -22,7 +24,7 @@ if [[ ! -d "$directory" ]]; then
   exit 1
 fi
 
-find "$directory" -type f -exec file -- {} + | grep -E 'PC bitmap|JPEG|PNG|TIFF' | tee image_list.txt
+find "$directory" -type f -exec file -- {} + | grep -E 'PC bitmap|JPEG|PNG|TIFF' > image_list.txt 2> image_err.txt
 nb=`grep bitmap image_list.txt | wc -l`
 printf 'Found %d bitmap files.\n' "$nb"
 nb2=`grep JPEG image_list.txt | wc -l`
