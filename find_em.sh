@@ -1,7 +1,5 @@
 #!/bin/bash
 
-exec > image_list.txt 2> image_err.txt
-
 # Windows laptop git bash usb drive: cd /d
 # chris@2022-inspiron MINGW64 /d
 # $ time ./find_em.sh ~
