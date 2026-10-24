@@ -1,17 +1,78 @@
+import argparse
+from dataclasses import dataclass, field
 from pathlib import Path
 
-with open("image_list.txt", encoding="utf-8") as image_list:
-    dirs = {}
-    for line in image_list:
-        strs = line.split(":")
-        file_path = Path(strs[0])
-        if (not dirs.get(file_path.parent)):
-            dirs[file_path.parent] = []
-        dirs[file_path.parent].append(file_path.name)
 
-for dir_path, files in dirs.items():
-    print(f"{dir_path}/: {len(files)} files \
-({', '.join(files[0:5])}{'...' if len(files) > 5 else ''})")
+@dataclass
+class Directory:
+    file_count: int = 0
+    children: dict[str, "Directory"] = field(default_factory=dict)
 
-nFiles = sum([len(files) for files in dirs.values()])
-print(f"Total files: {nFiles}")
+
+def build_tree(image_list_path: Path) -> dict[str, Directory]:
+    roots: dict[str, Directory] = {}
+
+    with image_list_path.open(encoding="utf-8") as image_list:
+        for line in image_list:
+            entry = line.strip()
+            if not entry:
+                continue
+
+            # `find_em.sh` appends file metadata after a colon.
+            file_path = Path(entry.partition(":")[0].strip())
+            root_name = file_path.anchor or "."
+            directory_parts = file_path.parent.parts
+            if file_path.anchor:
+                directory_parts = directory_parts[1:]
+
+            directory = roots.setdefault(root_name, Directory())
+            for part in directory_parts:
+                directory = directory.children.setdefault(part, Directory())
+            directory.file_count += 1
+
+    return roots
+
+
+def format_tree(roots: dict[str, Directory]) -> str:
+    lines: list[str] = []
+
+    def add_directory(name: str, directory: Directory, depth: int) -> None:
+        indent = " " * (4 * depth)
+        suffix = "" if name == "." or name.endswith(("/", "\\")) else "/"
+        file_label = "file" if directory.file_count == 1 else "files"
+        lines.append(f"{indent}{name}{suffix} ({directory.file_count} {file_label})")
+        for child_name, child in sorted(directory.children.items()):
+            add_directory(child_name, child, depth + 1)
+
+    for root_name, root in sorted(roots.items()):
+        add_directory(root_name, root, 0)
+
+    return "\n".join(lines) + ("\n" if lines else "")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Create a directory tree with the number of listed files in each directory."
+    )
+    parser.add_argument(
+        "input",
+        nargs="?",
+        type=Path,
+        default=Path("image_list.txt"),
+        help="input file list (default: image_list.txt)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=Path("directory_tree.txt"),
+        help="output text file (default: directory_tree.txt)",
+    )
+    args = parser.parse_args()
+
+    tree = build_tree(args.input)
+    args.output.write_text(format_tree(tree), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()
