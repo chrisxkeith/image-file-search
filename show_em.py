@@ -6,6 +6,7 @@ from pathlib import Path
 @dataclass
 class Directory:
     file_count: int = 0
+    files: list[str] = field(default_factory=list)
     children: dict[str, "Directory"] = field(default_factory=dict)
 
 
@@ -29,6 +30,7 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
             for part in directory_parts:
                 directory = directory.children.setdefault(part, Directory())
             directory.file_count += 1
+            directory.files.append(file_path.name.lstrip())
 
     return roots
 
@@ -47,6 +49,10 @@ def format_tree(roots: dict[str, Directory]) -> str:
         total_files = count_files(directory)
         file_label = "file" if total_files == 1 else "files"
         lines.append(f"{indent}{name}{suffix} ({total_files} {file_label})")
+        for file_name in directory.files[:5]:
+            lines.append(f"{indent}    {file_name}")
+        if len(directory.files) > 5:
+            lines.append(f"{indent}    ... and {len(directory.files) - 5} more files")
         for child_name, child in sorted(directory.children.items()):
             add_directory(child_name, child, depth + 1)
 
