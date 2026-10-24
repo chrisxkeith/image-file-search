@@ -7,6 +7,7 @@ if [[ ! -d "$directory" ]]; then
   exit 1
 fi
 
+
 find_options=(-type f)
 if [[ "$(uname -s)" == "Darwin" ]]; then
   find_options=(-type d \( -name Library -o -name Applications \) -prune -o -type f)
