@@ -36,11 +36,17 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
 def format_tree(roots: dict[str, Directory]) -> str:
     lines: list[str] = []
 
+    def count_files(directory: Directory) -> int:
+        return directory.file_count + sum(
+            count_files(child) for child in directory.children.values()
+        )
+
     def add_directory(name: str, directory: Directory, depth: int) -> None:
         indent = " " * (4 * depth)
         suffix = "" if name == "." or name.endswith(("/", "\\")) else "/"
-        file_label = "file" if directory.file_count == 1 else "files"
-        lines.append(f"{indent}{name}{suffix} ({directory.file_count} {file_label})")
+        total_files = count_files(directory)
+        file_label = "file" if total_files == 1 else "files"
+        lines.append(f"{indent}{name}{suffix} ({total_files} {file_label})")
         for child_name, child in sorted(directory.children.items()):
             add_directory(child_name, child, depth + 1)
 
@@ -52,7 +58,7 @@ def format_tree(roots: dict[str, Directory]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Create a directory tree with the number of listed files in each directory."
+        description="Create a directory tree with file totals including nested directories."
     )
     parser.add_argument(
         "input",
