@@ -7,7 +7,12 @@ if [[ ! -d "$directory" ]]; then
   exit 1
 fi
 
-find "$directory" -type f -exec file -- {} + | grep -E 'PC bitmap|JPEG|PNG|TIFF' > image_list.txt 2> image_err.txt
+find_options=(-type f)
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  find_options=(-type d \( -name Library -o -name Applications \) -prune -o -type f)
+fi
+
+find "$directory" "${find_options[@]}" -exec file -- {} + | grep -E 'PC bitmap|JPEG|PNG|TIFF' > image_list.txt 2> image_err.txt
 nb=`grep bitmap image_list.txt | wc -l`
 printf 'Found %d bitmap files.\n' "$nb"
 nb2=`grep JPEG image_list.txt | wc -l`
