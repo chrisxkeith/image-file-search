@@ -18,7 +18,12 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
             entry = line.strip()
             if not entry:
                 continue
-
+            if "TAXES".casefold() in entry.casefold() or \
+                "/Library/" in entry or \
+                "/System/" in entry or \
+                "/Applications/" in entry or \
+                ".dropbox" in entry:
+                continue
             # `find_em.sh` appends file metadata after a colon.
             file_path = Path(entry.partition(":")[0].strip())
             root_name = file_path.anchor or "."
