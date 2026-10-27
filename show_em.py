@@ -1,4 +1,5 @@
 import argparse
+import socket
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -63,6 +64,9 @@ def format_tree(roots: dict[str, Directory]) -> str:
 
     for root_name, root in sorted(roots.items()):
         add_directory(root_name, root, 0)
+
+    if lines:
+        lines[0] = f"/{socket.gethostname()}/{lines[0].lstrip('/')}"
 
     return "\n".join(lines) + ("\n" if lines else "")
 
