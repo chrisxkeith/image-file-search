@@ -1,4 +1,5 @@
 import argparse
+import re
 from dataclasses import dataclass, field
 from html import escape
 from pathlib import Path
@@ -41,15 +42,41 @@ def parse_outline(lines: list[str]) -> list[TreeNode]:
     return roots
 
 
-def render_nodes(nodes: list[TreeNode]) -> str:
+def render_nodes(
+    nodes: list[TreeNode],
+    parent_path: Path = Path("/"),
+    is_root: bool = True,
+) -> str:
     rendered: list[str] = []
     for node in nodes:
+        directory_name = re.sub(r" \(\d+ files?\)$", "", node.label)
+        is_directory = directory_name.endswith(("/", "\\"))
         label = escape(node.label)
+        if is_directory:
+            if is_root and directory_name.startswith("/"):
+                directory_path = Path("/")
+            else:
+                directory_path = parent_path / directory_name.strip("/\\")
+            directory_url = directory_path.as_uri()
+            url_markup = (
+                f'<div><a href="{escape(directory_url, quote=True)}">'
+                f"{escape(directory_url)}</a></div>\n"
+            )
+        else:
+            directory_path = parent_path
+            url_markup = ""
+
         if node.children:
             rendered.append(
                 f"<li><details><summary>{label}</summary>\n"
-                f"<ul>\n{render_nodes(node.children)}</ul>\n"
+                f"{url_markup}<ul>\n"
+                f"{render_nodes(node.children, directory_path, is_root=False)}</ul>\n"
                 "</details></li>\n"
+            )
+        elif is_directory:
+            rendered.append(
+                f"<li><details><summary>{label}</summary>\n"
+                f"{url_markup}</details></li>\n"
             )
         else:
             rendered.append(f"<li>{label}</li>\n")
