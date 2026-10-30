@@ -122,13 +122,13 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=Path("directory_tree.html"),
-        help="output HTML file (default: directory_tree.html)",
+        help="output HTML file (default: directory_tree.html beside the input file)",
     )
     args = parser.parse_args()
 
     roots = parse_outline(args.input.read_text(encoding="utf-8").splitlines())
-    args.output.write_text(render_html(roots), encoding="utf-8")
+    output_path = args.output or args.input.parent / "directory_tree.html"
+    output_path.write_text(render_html(roots), encoding="utf-8")
 
 
 if __name__ == "__main__":
