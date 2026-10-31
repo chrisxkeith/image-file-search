@@ -7,12 +7,21 @@ if [[ ! -d "$directory" ]]; then
   exit 1
 fi
 
+if [[ "$directory" == *"PHOTOSTICK"* ]]; then
+  machineName="PHOTOSTICK"
+elif [[ "$directory" == *"g-tech"* ]]; then
+  machineName="g-tech"
+elif [[ "$directory" == *"Sandisk"* ]]; then
+  machineName="Sandisk"
+else
+  machineName=$(uname -n)
+fi
+
 find_options=(-type f)
 if [[ "$(uname -s)" == "Darwin" ]]; then
   find_options=(-type d \( -name Library -o -name Applications \) -prune -o -type f)
 fi
 
-machineName=$(uname -n)
 find "$directory" "${find_options[@]}" -exec file -- {} + | \
         grep -E 'PC bitmap|JPEG|PNG|TIFF' > ${machineName}-image_list.txt 2> ${machineName}-image_err.txt
 nb1=`grep bitmap ${machineName}-image_list.txt | wc -l`
