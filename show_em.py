@@ -86,13 +86,13 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=Path("directory_tree.txt"),
-        help="output text file (default: directory_tree.txt)",
+        help="output text file (default: directory_tree.txt beside the input file)",
     )
     args = parser.parse_args()
 
     tree = build_tree(args.input)
-    args.output.write_text(format_tree(tree), encoding="utf-8")
+    output_path = args.output or args.input.parent / "directory_tree.txt"
+    output_path.write_text(format_tree(tree), encoding="utf-8")
 
 
 if __name__ == "__main__":

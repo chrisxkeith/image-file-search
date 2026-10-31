@@ -1,6 +1,7 @@
 #!/bin/bash
 # set -x
 machineName=$(uname -n)
+rm -rf data/ck/*
 time ./find_em.sh ~/Documents
 mv ${machineName}-image_list.txt data/ck/image_list.txt
 mv ${machineName}-image_err.txt data/ck/image_err.txt
