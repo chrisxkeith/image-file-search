@@ -65,7 +65,7 @@ def format_tree(roots: dict[str, Directory], filename: str) -> str:
         add_directory(root_name, root, 0)
 
     if lines:
-        lines[0] = f"/{filename.split('-')[0]}/{lines[0].lstrip('/')}"
+        lines[0] = f"/{filename.replace('-image_list.txt', '')}/{lines[0].lstrip('/')}"
 
     return "\n".join(lines) + ("\n" if lines else "")
 
