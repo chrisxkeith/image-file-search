@@ -1,5 +1,4 @@
 import argparse
-import socket
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -41,7 +40,7 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
     return roots
 
 
-def format_tree(roots: dict[str, Directory]) -> str:
+def format_tree(roots: dict[str, Directory], filename: str) -> str:
     lines: list[str] = []
 
     def count_files(directory: Directory) -> int:
@@ -66,7 +65,7 @@ def format_tree(roots: dict[str, Directory]) -> str:
         add_directory(root_name, root, 0)
 
     if lines:
-        lines[0] = f"/{socket.gethostname()}/{lines[0].lstrip('/')}"
+        lines[0] = f"/{filename.split('-')[0]}/{lines[0].lstrip('/')}"
 
     return "\n".join(lines) + ("\n" if lines else "")
 
@@ -92,7 +91,7 @@ def main() -> None:
 
     tree = build_tree(args.input)
     output_path = args.output or args.input.parent / "directory_tree.txt"
-    output_path.write_text(format_tree(tree), encoding="utf-8")
+    output_path.write_text(format_tree(tree, args.input.name), encoding="utf-8")
 
 
 if __name__ == "__main__":
