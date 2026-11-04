@@ -23,7 +23,13 @@ else
   path_=data/ck/
 fi
 
-find "$directory" "${find_options[@]}" -exec file -- {} + | \
+find "$directory" "${find_options[@]}" -exec sh -c '
+  for path do
+    description=$(file -- "$path") || exit
+    size=$(wc -c < "$path" | tr -d "[:space:]") || exit
+    printf "%s|%s\n" "$description" "$size"
+  done
+' sh {} + | \
         grep -v -E 'PC bitmap|JPEG|PNG|TIFF' \
          > ${path_}${machineName}-non_image_list.txt \
         2> ${path_}${machineName}-non_image_err.txt
