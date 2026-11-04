@@ -27,14 +27,13 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
                 ".dropbox" in entry:
                 continue
             file_info, separator, size_text = entry.rpartition("|")
-            if not separator:
-                raise ValueError(
-                    f"{image_list_path}:{line_number}: missing filesize after '|': {entry}"
-                )
-            try:
-                file_size = int(size_text.strip().removesuffix(" bytes"))
-            except ValueError as error:
-                file_size = 0
+            if separator:
+                try:
+                    file_size = int(size_text.strip().removesuffix(" bytes"))
+                except ValueError as error:
+                    file_size = -1
+            else:
+                file_size = -1
 
             # `find_em.sh` outputs the filename followed by `file` metadata.
             file_path = Path(file_info.partition(":")[0].strip())
