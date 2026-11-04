@@ -22,7 +22,13 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   find_options=(-type d \( -name Library -o -name Applications \) -prune -o -type f)
 fi
 
-find "$directory" "${find_options[@]}" -exec file -- {} + | \
+find "$directory" "${find_options[@]}" -exec sh -c '
+  for path do
+    description=$(file -- "$path") || exit
+    size=$(wc -c < "$path" | tr -d "[:space:]") || exit
+    printf "%s|%s\n" "$description" "$size"
+  done
+' sh {} + | \
         grep -E 'PC bitmap|JPEG|PNG|TIFF' > ${machineName}-image_list.txt 2> ${machineName}-image_err.txt
 nb1=`grep bitmap ${machineName}-image_list.txt | wc -l`
 printf 'Found %d bitmap files.\n' "$nb1"
