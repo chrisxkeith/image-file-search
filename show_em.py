@@ -6,7 +6,9 @@ from pathlib import Path
 @dataclass
 class Directory:
     file_count: int = 0
+    direct_size: int = 0
     files: list[str] = field(default_factory=list)
+    file_sizes: list[int] = field(default_factory=list)
     children: dict[str, "Directory"] = field(default_factory=dict)
 
 
@@ -14,7 +16,7 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
     roots: dict[str, Directory] = {}
 
     with image_list_path.open(encoding="utf-8") as image_list:
-        for line in image_list:
+        for line_number, line in enumerate(image_list, start=1):
             entry = line.strip()
             if not entry:
                 continue
@@ -24,8 +26,20 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
                 "/Applications/" in entry or \
                 ".dropbox" in entry:
                 continue
-            # `find_em.sh` appends file metadata after a colon.
-            file_path = Path(entry.partition(":")[0].strip())
+            file_info, separator, size_text = entry.rpartition("|")
+            if not separator:
+                raise ValueError(
+                    f"{image_list_path}:{line_number}: missing filesize after '|': {entry}"
+                )
+            try:
+                file_size = int(size_text.strip().removesuffix(" bytes"))
+            except ValueError as error:
+                raise ValueError(
+                    f"{image_list_path}:{line_number}: invalid filesize: {size_text.strip()}"
+                ) from error
+
+            # `find_em.sh` outputs the filename followed by `file` metadata.
+            file_path = Path(file_info.partition(":")[0].strip())
             root_name = file_path.anchor or "."
             directory_parts = file_path.parent.parts
             if file_path.anchor:
@@ -35,7 +49,9 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
             for part in directory_parts:
                 directory = directory.children.setdefault(part, Directory())
             directory.file_count += 1
+            directory.direct_size += file_size
             directory.files.append(file_path.name.lstrip())
+            directory.file_sizes.append(file_size)
 
     return roots
 
@@ -43,19 +59,26 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
 def format_tree(roots: dict[str, Directory], filename: str) -> str:
     lines: list[str] = []
 
-    def count_files(directory: Directory) -> int:
-        return directory.file_count + sum(
-            count_files(child) for child in directory.children.values()
+    def totals(directory: Directory) -> tuple[int, int]:
+        child_totals = [totals(child) for child in directory.children.values()]
+        return (
+            directory.file_count + sum(files for files, _ in child_totals),
+            directory.direct_size + sum(size for _, size in child_totals),
         )
 
     def add_directory(name: str, directory: Directory, depth: int) -> None:
         indent = " " * (4 * depth)
         suffix = "" if name == "." or name.endswith(("/", "\\")) else "/"
-        total_files = count_files(directory)
+        total_files, total_size = totals(directory)
         file_label = "file" if total_files == 1 else "files"
-        lines.append(f"{indent}{name}{suffix} ({total_files} {file_label})")
-        for file_name in directory.files[:5]:
-            lines.append(f"{indent}    {file_name}")
+        size_label = "byte" if total_size == 1 else "bytes"
+        lines.append(
+            f"{indent}{name}{suffix} "
+            f"({total_files} {file_label}, {total_size} {size_label})"
+        )
+        for file_name, file_size in zip(directory.files[:5], directory.file_sizes[:5]):
+            file_size_label = "byte" if file_size == 1 else "bytes"
+            lines.append(f"{indent}    {file_name} ({file_size} {file_size_label})")
         if len(directory.files) > 5:
             lines.append(f"{indent}    ... and {len(directory.files) - 5} more files")
         for child_name, child in sorted(directory.children.items()):
