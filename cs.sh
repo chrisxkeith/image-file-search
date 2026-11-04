@@ -1,7 +1,11 @@
 #!/bin/bash
 set -x
-time ./find_em.sh /media/ck/PHOTOSTICK/
-time ./find_non_image_files.sh /media/ck/PHOTOSTICK/
+if [ ! -f "data/cs/PHOTOSTICK-image_list.txt" ]; then
+    time ./find_em.sh /media/ck/PHOTOSTICK/
+fi
+if [ ! -f "data/cs/PHOTOSTICK-non_image_list.txt" ]; then
+    time ./find_non_image_files.sh /media/ck/PHOTOSTICK/
+fi
 # time ./find_em.sh "/media/ck/G-DRIVE ArmourATD/"
 # time ./find_non_image_files.sh "/media/ck/G-DRIVE ArmourATD/"
 mv *.txt data/cs/

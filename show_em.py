@@ -34,9 +34,7 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
             try:
                 file_size = int(size_text.strip().removesuffix(" bytes"))
             except ValueError as error:
-                raise ValueError(
-                    f"{image_list_path}:{line_number}: invalid filesize: {size_text.strip()}"
-                ) from error
+                file_size = 0
 
             # `find_em.sh` outputs the filename followed by `file` metadata.
             file_path = Path(file_info.partition(":")[0].strip())
