@@ -20,15 +20,17 @@ for file in data/cs/*-image_list.txt; do
     python3 show_em.py "$file"
     machine=${file##*/}
     machine=${machine%-image_list.txt}
+    mv data/cs/directory_tree.txt data/cs/${machine}-directory_tree.txt
     python3 tree_to_html.py  -o data/cs/${machine}-directory_tree.html \
-        data/cs/${machine}_directory_tree.txt
-    /usr/bin/google-chrome-stable --new-window data/cs/${machine}_directory_tree.html
+        data/cs/${machine}-directory_tree.txt
+    /usr/bin/google-chrome-stable --new-window data/cs/${machine}-directory_tree.html
 done
 for file in data/cs/*-non_image_list.txt; do
     sed -i 's|/media/ck|/Volumes|g' $file
     python3 show_em.py "$file"
     machine=${file##*/}
     machine=${machine%-non_image_list.txt}
+    mv data/cs/directory_tree.txt data/cs/${machine}-non_directory_tree.txt
     python3 tree_to_html.py -o data/cs/${machine}-non_directory_tree.html \
         data/cs/${machine}-non_directory_tree.txt
     /usr/bin/google-chrome-stable --new-window data/cs/${machine}-non_directory_tree.html
