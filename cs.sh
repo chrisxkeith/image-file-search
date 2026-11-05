@@ -6,8 +6,12 @@ fi
 if [ ! -f "data/cs/PHOTOSTICK-non_image_list.txt" ]; then
     time ./find_non_image_files.sh /media/ck/PHOTOSTICK/
 fi
-# time ./find_em.sh "/media/ck/G-DRIVE ArmourATD/"
-# time ./find_non_image_files.sh "/media/ck/G-DRIVE ArmourATD/"
+if [ ! -f "data/cs/Sandisk-G-image_list.txt" ]; then
+    time ./find_em.sh "/media/ck/G-DRIVE ArmorATD"
+fi
+if [ ! -f "data/cs/Sandisk-G-non_image_list.txt" ]; then
+    time ./find_non_image_files.sh "/media/ck/G-DRIVE ArmorATD"
+fi
 mv *.txt data/cs/
 rm -f data/cs/combined_directory_tree.txt
 rm -f data/cs/*.html
@@ -16,8 +20,8 @@ for file in data/cs/*-image_list.txt; do
     python3 show_em.py "$file"
     machine=${file##*/}
     machine=${machine%-image_list.txt}
-    python3 tree_to_html.py data/cs/${machine}_directory_tree.txt
-    mv data/cs/directory_tree.html data/cs/${machine}_directory_tree.html
+    python3 tree_to_html.py  -o data/cs/${machine}-directory_tree.html \
+        data/cs/${machine}_directory_tree.txt
     /usr/bin/google-chrome-stable --new-window data/cs/${machine}_directory_tree.html
 done
 for file in data/cs/*-non_image_list.txt; do
@@ -26,6 +30,6 @@ for file in data/cs/*-non_image_list.txt; do
     machine=${file##*/}
     machine=${machine%-non_image_list.txt}
     python3 tree_to_html.py -o data/cs/${machine}-non_directory_tree.html \
-        data/cs/${machine}-non_image_list.txt
+        data/cs/${machine}-non_directory_tree.txt
     /usr/bin/google-chrome-stable --new-window data/cs/${machine}-non_directory_tree.html
 done

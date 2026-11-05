@@ -11,8 +11,8 @@ if [[ "$directory" == *"PHOTOSTICK"* ]]; then
   machineName="PHOTOSTICK"
 elif [[ "$directory" == *"g-tech"* ]]; then
   machineName="g-tech"
-elif [[ "$directory" == *"Sandisk"* ]]; then
-  machineName="Sandisk"
+elif [[ "$directory" == *"G-DRIVE"* ]]; then
+  machineName="Sandisk-G"
 else
   machineName=$(uname -n)
 fi
