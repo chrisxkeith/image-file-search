@@ -56,6 +56,14 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
 def format_tree(roots: dict[str, Directory], filename: str) -> str:
     lines: list[str] = []
 
+    def format_size(size: int) -> str:
+        if size >= 1024**3:
+            return f"{size / 1024**3:.1f} gigabytes"
+        if size >= 1024**2:
+            return f"{size / 1024**2:.1f} megabytes"
+        size_label = "byte" if size == 1 else "bytes"
+        return f"{size} {size_label}"
+
     def totals(directory: Directory) -> tuple[int, int]:
         child_totals = [totals(child) for child in directory.children.values()]
         return (
@@ -68,10 +76,9 @@ def format_tree(roots: dict[str, Directory], filename: str) -> str:
         suffix = "" if name == "." or name.endswith(("/", "\\")) else "/"
         total_files, total_size = totals(directory)
         file_label = "file" if total_files == 1 else "files"
-        size_label = "byte" if total_size == 1 else "bytes"
         lines.append(
-            f"{indent}{name}{suffix} "
-            f"({total_files} {file_label}, {total_size} {size_label})"
+            f"{indent}{name}{suffix} ({total_files} {file_label}, "
+            f"{format_size(total_size)})"
         )
         for file_name, file_size in zip(directory.files[:5], directory.file_sizes[:5]):
             file_size_label = "byte" if file_size == 1 else "bytes"
