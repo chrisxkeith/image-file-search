@@ -52,6 +52,8 @@ def render_nodes(
         directory_name = re.sub(r" \(\d+ files?\)$", "", node.label)
         is_directory = directory_name.endswith(("/", "\\"))
         label = escape(node.label)
+        if label.startswith("... and ") and label.endswith(" more files"):
+            label = "<u><i>" + label + "</i></u>"
         if is_directory:
             if is_root and directory_name.startswith("/"):
                 directory_path = Path("/")
