@@ -9,10 +9,10 @@ fi
 
 if [[ "$directory" == *"PHOTOSTICK"* ]]; then
   machineName="PHOTOSTICK"
-elif [[ "$directory" == *"g-tech"* ]]; then
-  machineName="g-tech"
-elif [[ "$directory" == *"G-DRIVE"* ]]; then
+elif [[ "$directory" == *"G-DRIVE ArmorATD"* ]]; then # handle this first to avoid matching the generic G-DRIVE case
   machineName="Sandisk-G"
+elif [[ "$directory" == *"G-DRIVE"* ]]; then
+  machineName="g-tech"
 else
   machineName=$(uname -n)
 fi
