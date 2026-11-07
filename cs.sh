@@ -4,19 +4,19 @@ if [ ! -f "data/cs/PHOTOSTICK-image_list.txt" ]; then
     time ./find_em.sh /media/ck/PHOTOSTICK/
 fi
 if [ ! -f "data/cs/PHOTOSTICK-non_image_list.txt" ]; then
-    time ./find_non_image_files.sh /media/ck/PHOTOSTICK/
+    time ./find_em.sh -v /media/ck/PHOTOSTICK/
 fi
 if [ ! -f "data/cs/Sandisk-G-image_list.txt" ]; then
     time ./find_em.sh "/media/ck/G-DRIVE ArmorATD/Backups.backupdb/Christopher’s iMac/2023-09-23-040202"
 fi
 if [ ! -f "data/cs/Sandisk-G-non_image_list.txt" ]; then
-    time ./find_non_image_files.sh "/media/ck/G-DRIVE ArmorATD/Backups.backupdb/Christopher’s iMac/2023-09-23-040202"
+    time ./find_em.sh -v "/media/ck/G-DRIVE ArmorATD/Backups.backupdb/Christopher’s iMac/2023-09-23-040202"
 fi
 if [ ! -f "data/cs/g-tech-image_list.txt" ]; then
     time ./find_em.sh "/media/ck/G-DRIVE"
 fi
 if [ ! -f "data/cs/g-tech-non_image_list.txt" ]; then
-    time ./find_non_image_files.sh "/media/ck/G-DRIVE"
+    time ./find_em.sh -v "/media/ck/G-DRIVE"
 fi
 
 mv *.txt data/cs/
