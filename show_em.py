@@ -73,6 +73,7 @@ def format_tree(roots: dict[str, Directory], filename: str) -> str:
 
     def add_directory(name: str, directory: Directory, depth: int) -> None:
         indent = " " * (4 * depth)
+        name = name.strip()
         suffix = "" if name == "." or name.endswith(("/", "\\")) else "/"
         total_files, total_size = totals(directory)
         file_label = "file" if total_files == 1 else "files"

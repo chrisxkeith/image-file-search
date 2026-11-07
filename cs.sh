@@ -18,7 +18,7 @@ fi
 mv *.txt data/cs/
 rm -f data/cs/combined_directory_tree.txt
 rm -f data/cs/*.html
-for file in data/cs/*-image_list.txt; do
+for file in data/cs/g-tech-image_list.txt; do
     sed -i 's|/media/ck|/Volumes|g' $file
     python3 show_em.py "$file"
     machine=${file##*/}
@@ -28,7 +28,7 @@ for file in data/cs/*-image_list.txt; do
         data/cs/${machine}-directory_tree.txt
     /usr/bin/google-chrome-stable --new-window data/cs/${machine}-directory_tree.html
 done
-for file in data/cs/*-non_image_list.txt; do
+for file in data/cs/g-tech-non_image_list.txt; do
     sed -i 's|/media/ck|/Volumes|g' $file
     python3 show_em.py "$file"
     machine=${file##*/}
