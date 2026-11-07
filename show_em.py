@@ -41,6 +41,11 @@ def build_tree(image_list_path: Path) -> dict[str, Directory]:
             directory_parts = file_path.parent.parts
             if file_path.anchor:
                 directory_parts = directory_parts[1:]
+            if any(
+                part.strip().startswith(".") and part.strip() not in {".", ".."}
+                for part in directory_parts
+            ):
+                continue
 
             directory = roots.setdefault(root_name, Directory())
             for part in directory_parts:

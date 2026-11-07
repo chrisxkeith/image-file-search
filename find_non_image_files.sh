@@ -9,7 +9,7 @@ fi
 
 find_options=(-type f)
 if [[ "$(uname -s)" == "Darwin" ]]; then
-  find_options=(-type d \( -name Library -o -name Applications \) -prune -o -type f)
+  find_options=(-type d \( -name Library -o -name Applications -o -name System -o -name ".*" \) -prune -o -type f)
 fi
 path_=data/cs/
 if [[ "$directory" == *"PHOTOSTICK"* ]]; then
