@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -x
+set -x
 if [ ! -f "data/cs/PHOTOSTICK-image_list.txt" ]; then
     time ./find_em.sh /media/ck/PHOTOSTICK/
 fi
@@ -15,9 +15,9 @@ fi
 if [ ! -f "data/cs/g-tech-image_list.txt" ]; then
     time ./find_em.sh "/media/ck/G-DRIVE"
 fi
-if [ ! -f "data/cs/g-tech-non_image_list.txt" ]; then
-    time ./find_em.sh -v "/media/ck/G-DRIVE"
-fi
+#if [ ! -f "data/cs/g-tech-non_image_list.txt" ]; then
+#    time ./find_em.sh -v "/media/ck/G-DRIVE"
+#fi
 
 mv *.txt data/cs/
 rm -f data/cs/combined_directory_tree.txt
